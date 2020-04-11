@@ -25,9 +25,6 @@ const (
 
 // New returns a new DB connection that wraps the given dbx.DB instance.
 func New(db *dbx.DB) *DB {
-	db.TableMapper = func(a interface{}) string {
-		return "s"
-	}
 	return &DB{db}
 }
 
