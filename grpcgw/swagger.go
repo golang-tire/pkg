@@ -59,7 +59,7 @@ func RegisterSwagger(paths, definitions map[string]interface{}) {
 	}
 }
 
-func (sw *swaggerServer)swaggerHandler(w http.ResponseWriter, r *http.Request) {
+func (sw *swaggerServer) swaggerHandler(w http.ResponseWriter, r *http.Request) {
 	swaggerLock.Lock()
 	defer swaggerLock.Unlock()
 

@@ -60,8 +60,8 @@ var (
 	grpcAddr string
 
 	defaultServerOptions = serverOptions{
-		httpPort: 8080,
-		grpcPort: 9090,
+		httpPort:       8080,
+		grpcPort:       9090,
 		swaggerBaseURL: "/v1/swagger",
 	}
 )

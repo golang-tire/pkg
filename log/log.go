@@ -12,7 +12,6 @@ var (
 	logger *zap.Logger
 )
 
-
 // Init initialize logger, if debug set to true zap.NewDevelopment will use to
 // create a zap logger otherwise zap.NewProduction will use
 func Init(ctx context.Context, debug bool) error {
