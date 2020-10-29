@@ -41,11 +41,14 @@ func (fdo *funcServerOption) apply(do *serverOptions) {
 	fdo.f(do)
 }
 
+// Controller interface provide a way for each grpc and rest service to register their services
+// in server
 type Controller interface {
 	InitRest(ctx context.Context, conn *grpc.ClientConn, mux *runtime.ServeMux)
 	InitGrpc(ctx context.Context, server *grpc.Server)
 }
 
+// Interceptor interface provide a way to add custom interceptors for Unary and Stream server
 type Interceptor struct {
 	Unary  grpc.UnaryServerInterceptor
 	Stream grpc.StreamServerInterceptor
@@ -93,12 +96,14 @@ func SwaggerBaseURL(s string) ServerOption {
 	})
 }
 
+// RegisterController register a controller
 func RegisterController(c Controller) {
 	lock.Lock()
 	defer lock.Unlock()
 	controllers = append(controllers, c)
 }
 
+// RegisterInterceptors register custom interceptors
 func RegisterInterceptors(i Interceptor) {
 	lock.Lock()
 	defer lock.Unlock()

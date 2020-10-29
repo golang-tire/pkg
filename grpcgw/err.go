@@ -29,10 +29,10 @@ type GWError interface {
 }
 
 type gwError struct {
-	Err     error             `json:"-"`
-	Msg     string            `json:"message"`
-	Status_ int               `json:"status"`
-	Fields_ map[string]string `json:"fields,omitempty"`
+	Err        error             `json:"-"`
+	Msg        string            `json:"message"`
+	StatusCode int               `json:"status"`
+	FieldsMap  map[string]string `json:"fields,omitempty"`
 }
 
 func (gw *gwError) Error() string {
@@ -41,7 +41,7 @@ func (gw *gwError) Error() string {
 }
 
 func (gw *gwError) Status() int {
-	return gw.Status_
+	return gw.StatusCode
 }
 
 func (gw *gwError) Message() string {
@@ -49,7 +49,7 @@ func (gw *gwError) Message() string {
 }
 
 func (gw *gwError) Fields() map[string]string {
-	return gw.Fields_
+	return gw.FieldsMap
 }
 
 // NewNotFound return not found error
@@ -65,14 +65,14 @@ func NewBadRequest(err error, message string) error {
 // NewBadRequestStatus is the bad request
 func NewBadRequestStatus(err error, message string, status int) error {
 	ret := &gwError{
-		Err:     errors.Wrap(err, message),
-		Msg:     errors.Wrap(err, message).Error(),
-		Status_: status,
+		Err:        errors.Wrap(err, message),
+		Msg:        errors.Wrap(err, message).Error(),
+		StatusCode: status,
 	}
 	if v, ok := err.(validation.Errors); ok {
-		ret.Fields_ = make(map[string]string)
+		ret.FieldsMap = make(map[string]string)
 		for k, e := range v {
-			ret.Fields_[k] = e.Error()
+			ret.FieldsMap[k] = e.Error()
 		}
 	}
 	return ret
@@ -86,20 +86,20 @@ func tryGRPCError(err error) GWError {
 	g, ok := err.(grpcErr)
 	if !ok {
 		return &gwError{
-			Msg:     "unknown",
-			Status_: http.StatusInternalServerError,
+			Msg:        "unknown",
+			StatusCode: http.StatusInternalServerError,
 		}
 	}
 	switch g.GRPCStatus().Code() {
 	case codes.InvalidArgument:
 		return &gwError{
-			Status_: http.StatusBadRequest,
-			Msg:     "invalid json input",
+			StatusCode: http.StatusBadRequest,
+			Msg:        "invalid json input",
 		}
 	default:
 		return &gwError{
-			Msg:     "internal error with code: " + g.GRPCStatus().Code().String(),
-			Status_: http.StatusInternalServerError,
+			Msg:        "internal error with code: " + g.GRPCStatus().Code().String(),
+			StatusCode: http.StatusInternalServerError,
 		}
 	}
 }
@@ -130,10 +130,10 @@ func defaultHTTPError(ctx context.Context, _ *runtime.ServeMux, marshaler runtim
 	body, ok := g.(*gwError)
 	if !ok {
 		body = &gwError{
-			Err:     err,
-			Msg:     g.Message(),
-			Status_: g.Status(),
-			Fields_: g.Fields(),
+			Err:        err,
+			Msg:        g.Message(),
+			StatusCode: g.Status(),
+			FieldsMap:  g.Fields(),
 		}
 	}
 

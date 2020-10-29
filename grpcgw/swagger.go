@@ -46,6 +46,7 @@ var (
 	}
 )
 
+// RegisterSwagger register each service paths and definitions to show in final swagger file
 func RegisterSwagger(paths, definitions map[string]interface{}) {
 	swaggerLock.Lock()
 	defer swaggerLock.Unlock()

@@ -28,7 +28,7 @@ func TestIsValidUUID(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if IsValidUUID(tt.uuid) != tt.isValid {
-				t.Errorf("IsValidUUID(%s) returnd %v, we want %v", tt.uuid, !tt.isValid, tt.isValid)
+				t.Errorf("IsValidUUID(%s) returned %v, we want %v", tt.uuid, !tt.isValid, tt.isValid)
 			}
 		})
 	}

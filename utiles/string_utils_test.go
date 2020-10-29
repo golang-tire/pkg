@@ -30,7 +30,7 @@ func TestStrListContain(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			result := StrListContain(tt.list, tt.term)
 			if result != tt.isContain {
-				t.Errorf("StrListContain(%s, %s) returnd %v, we want %v", tt.list, tt.term, result, tt.isContain)
+				t.Errorf("StrListContain(%s, %s) returned %v, we want %v", tt.list, tt.term, result, tt.isContain)
 			}
 		})
 	}
