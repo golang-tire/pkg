@@ -24,6 +24,7 @@ type serverOptions struct {
 	httpPort       int
 	grpcPort       int
 	swaggerBaseURL string
+	emitDefaults   bool
 }
 
 // A ServerOption sets options such as ports, paths parameters, etc.
@@ -66,6 +67,7 @@ var (
 		httpPort:       8080,
 		grpcPort:       9090,
 		swaggerBaseURL: "/v1/swagger",
+		emitDefaults:   false,
 	}
 )
 
@@ -93,6 +95,13 @@ func GrpcPort(n int) ServerOption {
 func SwaggerBaseURL(s string) ServerOption {
 	return newFuncServerOption(func(o *serverOptions) {
 		o.swaggerBaseURL = s
+	})
+}
+
+// EmitDefaults returns a ServerOption that will apply EmitDefaults option for jsonb
+func EmitDefaults(b bool) ServerOption {
+	return newFuncServerOption(func(o *serverOptions) {
+		o.emitDefaults = b
 	})
 }
 
@@ -149,7 +158,7 @@ func gRPCClient() (*grpc.ClientConn, error) {
 func serveHTTP(ctx context.Context, opts serverOptions) (func() error, error) {
 
 	jsonpb := &runtime.JSONPb{
-		EmitDefaults: false,
+		EmitDefaults: opts.emitDefaults,
 		Indent:       "  ",
 		OrigName:     true,
 	}
