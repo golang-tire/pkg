@@ -21,10 +21,10 @@ import (
 )
 
 type serverOptions struct {
-	httpPort       int
-	grpcPort       int
-	swaggerBaseURL string
-	emitDefaults   bool
+	httpPort        int
+	grpcPort        int
+	swaggerBaseURL  string
+	serveMuxOptions []runtime.ServeMuxOption
 }
 
 // A ServerOption sets options such as ports, paths parameters, etc.
@@ -67,7 +67,6 @@ var (
 		httpPort:       8080,
 		grpcPort:       9090,
 		swaggerBaseURL: "/v1/swagger",
-		emitDefaults:   false,
 	}
 )
 
@@ -98,10 +97,10 @@ func SwaggerBaseURL(s string) ServerOption {
 	})
 }
 
-// EmitDefaults returns a ServerOption that will apply EmitDefaults option for jsonb
-func EmitDefaults(b bool) ServerOption {
+// ServeMuxOptions returns a ServerOption that will apply ServeMuxOptions option for mux
+func ServeMuxOptions(opts ...runtime.ServeMuxOption) ServerOption {
 	return newFuncServerOption(func(o *serverOptions) {
-		o.emitDefaults = b
+		o.serveMuxOptions = opts
 	})
 }
 
@@ -157,17 +156,9 @@ func gRPCClient() (*grpc.ClientConn, error) {
 // Serve start the server and wait
 func serveHTTP(ctx context.Context, opts serverOptions) (func() error, error) {
 
-	jsonpb := &runtime.JSONPb{
-		EmitDefaults: opts.emitDefaults,
-		Indent:       "  ",
-		OrigName:     true,
-	}
 	var (
 		normalMux = http.NewServeMux()
-		mux       = runtime.NewServeMux(
-			runtime.WithMarshalerOption(runtime.MIMEWildcard, jsonpb),
-			runtime.WithProtoErrorHandler(runtime.DefaultHTTPProtoErrorHandler),
-		)
+		mux       = runtime.NewServeMux(opts.serveMuxOptions...)
 	)
 	c, err := gRPCClient()
 	if err != nil {
@@ -175,7 +166,6 @@ func serveHTTP(ctx context.Context, opts serverOptions) (func() error, error) {
 	}
 
 	sw := &swaggerServer{swaggerBaseURL: opts.swaggerBaseURL}
-
 	normalMux.HandleFunc(opts.swaggerBaseURL, sw.swaggerHandler)
 	for i := range controllers {
 		controllers[i].InitRest(ctx, c, mux)
