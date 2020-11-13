@@ -1,0 +1,30 @@
+package session
+
+import (
+	"encoding/json"
+	"github.com/golang-tire/pkg/kv"
+	"time"
+)
+
+// Get get a data from session if its available
+func Get(key string, data interface{}) error {
+	val, err := kv.Get().GetString(key)
+	if err != nil {
+		return err
+	}
+	return json.Unmarshal([]byte(val), data)
+}
+
+// Set set new key/value into session data
+func Set(key string, data interface{}, duration time.Duration) error {
+	val, err := json.Marshal(data)
+	if err != nil {
+		return err
+	}
+	return kv.Get().Set(key, string(val), duration)
+}
+
+// Delete will remove a key from session
+func Delete(key string) error {
+	return kv.Get().Delete(key)
+}
