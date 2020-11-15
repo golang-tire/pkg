@@ -45,7 +45,7 @@ func (fdo *funcServerOption) apply(do *serverOptions) {
 // Controller interface provide a way for each grpc and rest service to register their services
 // in server
 type Controller interface {
-	InitRest(ctx context.Context, conn *grpc.ClientConn, mux *runtime.ServeMux)
+	InitRest(ctx context.Context, conn *grpc.ClientConn, mux *runtime.ServeMux, httpMux *http.ServeMux)
 	InitGrpc(ctx context.Context, server *grpc.Server)
 }
 
@@ -167,8 +167,9 @@ func serveHTTP(ctx context.Context, opts serverOptions) (func() error, error) {
 
 	sw := &swaggerServer{swaggerBaseURL: opts.swaggerBaseURL}
 	normalMux.HandleFunc(opts.swaggerBaseURL, sw.swaggerHandler)
+
 	for i := range controllers {
-		controllers[i].InitRest(ctx, c, mux)
+		controllers[i].InitRest(ctx, c, mux, normalMux)
 	}
 
 	normalMux.Handle("/", cors.AllowAll().Handler(mux))
