@@ -13,6 +13,7 @@ var (
 	client *Client
 )
 
+// Config kv redis config
 type Config struct {
 	Host     string
 	Port     int
@@ -20,6 +21,7 @@ type Config struct {
 	DB       int
 }
 
+// Client kv client service
 type Client struct {
 	ctx    context.Context
 	client *redis.Client
@@ -102,5 +104,25 @@ func Init(ctx context.Context, config *Config) (*Client, error) {
 	}()
 
 	client = &Client{ctx: ctx, client: rdb}
+	return client, nil
+}
+
+// InitWithConn initialize the key value store using a given redis client
+func InitWithConn(ctx context.Context, redisClient *redis.Client) (*Client, error) {
+
+	_, err := redisClient.Ping(ctx).Result()
+	if err != nil {
+		log.Error("kv: connect error", log.Err(err))
+		return nil, err
+	}
+
+	go func() {
+		<-ctx.Done()
+		if err := redisClient.Close(); err != nil {
+			log.Error("error in close redis connection", log.Err(err))
+		}
+	}()
+
+	client = &Client{ctx: ctx, client: redisClient}
 	return client, nil
 }

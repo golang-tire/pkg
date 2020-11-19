@@ -9,6 +9,7 @@ import (
 
 var redisServer *miniredis.Miniredis
 
+// InitMock create a kv client instance for tests
 func InitMock(ctx context.Context, config *Config) (*Client, error) {
 
 	if config == nil {

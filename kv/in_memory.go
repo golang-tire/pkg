@@ -4,13 +4,16 @@ import "sync"
 
 var (
 	inMemory *InMemory
+	doOnce   sync.Once
 )
 
+// InMemory in memory kv service
 type InMemory struct {
 	data map[string]string
 	lock sync.RWMutex
 }
 
+// Memory retun in memory kv instance
 func Memory() *InMemory {
 	return inMemory
 }
@@ -33,6 +36,8 @@ func (i *InMemory) Get(key string) (string, bool) {
 }
 
 func init() {
-	inMemory = new(InMemory)
-	inMemory.data = make(map[string]string)
+	doOnce.Do(func() {
+		inMemory = new(InMemory)
+		inMemory.data = make(map[string]string)
+	})
 }
