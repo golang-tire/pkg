@@ -31,6 +31,16 @@ func (cc *configHolder) RegisterString(key, defValue string) String {
 	return stringHolder{value: &v}
 }
 
+// RegisterStringSlice register an string variable
+func RegisterStringSlice(key string, defValue []string) StringSlice {
+	return confWatch.RegisterStringSlice(key, defValue)
+}
+func (cc *configHolder) RegisterStringSlice(key string, defValue []string) StringSlice {
+	var v = defValue
+	cc.addRef(key, &v, defValue)
+	return stringSliceHolder{value: &v}
+}
+
 // RegisterInt register an integer variable
 func RegisterInt(key string, defValue int) Int { return confWatch.RegisterInt(key, defValue) }
 func (cc *configHolder) RegisterInt(key string, defValue int) Int {
@@ -82,42 +92,49 @@ func (cc *configHolder) handleChange() error {
 	for _, configItem := range cc.confItems {
 		switch configItem.defValue.(type) {
 		case string:
-			v, err := getViperString(configItem.key, configItem.defValue)
+			v, err := getViperString(configItem.key, configItem.defValue.(string))
 			if err != nil {
 				return err
 			}
 			t := configItem.ref.(*string)
 			*t = v
+		case []string:
+			v, err := getViperStringArray(configItem.key, configItem.defValue.([]string))
+			if err != nil {
+				return err
+			}
+			t := configItem.ref.(*[]string)
+			*t = v
 		case int:
-			v, err := getViperInt64(configItem.key, configItem.defValue)
+			v, err := getViperInt64(configItem.key, int64(configItem.defValue.(int)))
 			if err != nil {
 				return err
 			}
 			t := configItem.ref.(*int64)
 			*t = v
 		case int64:
-			v, err := getViperInt64(configItem.key, configItem.defValue)
+			v, err := getViperInt64(configItem.key, configItem.defValue.(int64))
 			if err != nil {
 				return err
 			}
 			t := configItem.ref.(*int64)
 			*t = v
 		case float32:
-			v, err := getViperFloat32(configItem.key, configItem.defValue)
+			v, err := getViperFloat32(configItem.key, configItem.defValue.(float32))
 			if err != nil {
 				return err
 			}
 			t := configItem.ref.(*float32)
 			*t = v
 		case float64:
-			v, err := getViperFloat64(configItem.key, configItem.defValue)
+			v, err := getViperFloat64(configItem.key, configItem.defValue.(float64))
 			if err != nil {
 				return err
 			}
 			t := configItem.ref.(*float64)
 			*t = v
 		case bool:
-			v, err := getViperBool(configItem.key, configItem.defValue)
+			v, err := getViperBool(configItem.key, configItem.defValue.(bool))
 			if err != nil {
 				return err
 			}

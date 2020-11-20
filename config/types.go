@@ -22,6 +22,11 @@ type Bool interface {
 	Bool() bool
 }
 
+// StringSlice type interface
+type StringSlice interface {
+	Slice() []string
+}
+
 type intHolder struct {
 	value *int64
 }
@@ -36,6 +41,10 @@ type floatHolder struct {
 
 type boolHolder struct {
 	value *bool
+}
+
+type stringSliceHolder struct {
+	value *[]string
 }
 
 // String will return value of string variable
@@ -66,4 +75,9 @@ func (fh floatHolder) Float64() float64 {
 // Bool will return value of bool variable
 func (bh boolHolder) Bool() bool {
 	return *bh.value
+}
+
+// StringSlice will return value of string array variable
+func (sr stringSliceHolder) Slice() []string {
+	return *sr.value
 }

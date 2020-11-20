@@ -1,9 +1,7 @@
 package config
 
 import (
-	"io/ioutil"
 	"os"
-	"path"
 	"testing"
 
 	"github.com/spf13/viper"
@@ -22,32 +20,14 @@ services:
     engine: postgres
 `)
 
-func writeConfig(data []byte) string {
-	dir, err := os.Getwd()
-	if err != nil {
-		panic(err)
-	}
-
-	fileName := path.Join(dir, "config.yaml")
-
-	err = ioutil.WriteFile(fileName, data, 0644)
-	if err != nil {
-		panic(err)
-	}
-	return fileName
-}
-
 func TestMain(t *testing.M) {
 
-	fileName := writeConfig(sampleConfigW)
-
+	fileName := writeConfig("wrapper_test", sampleConfigW)
 	code := t.Run()
-
 	err := os.Remove(fileName)
 	if err != nil {
 		panic(err)
 	}
-
 	os.Exit(code)
 }
 
@@ -59,7 +39,7 @@ func Test_initViper(t *testing.T) {
 		return nil
 	}
 
-	err := initViper("config", "yaml", "test", onChange)
+	err := initViper("wrapper_test", "yaml", "test", onChange)
 	if err != nil {
 		t.Errorf("init viper failed %v", err)
 	}
@@ -80,9 +60,13 @@ services:
   db: 
     connection: "postgres://"
     engine: postgres
+urls:
+  - "url-one"
+  - "url-two"
+  - "url-three"
 	`)
 
-	writeConfig(sampleConfigChanged)
+	writeConfig("wrapper_test", sampleConfigChanged)
 	if settingChanged != true {
 		t.Error("setting file changed but watch not worked")
 	}

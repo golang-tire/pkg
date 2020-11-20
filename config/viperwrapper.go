@@ -7,62 +7,50 @@ import (
 	"github.com/spf13/viper"
 )
 
-func getViperString(key string, defaultValue interface{}) (string, error) {
+func getViperString(key string, defaultValue string) (string, error) {
 	v := viper.GetString(key)
 	if v == "" {
-		s, ok := defaultValue.(string)
-		if ok {
-			return s, nil
-		}
-		return "", fmt.Errorf("convert key %s to string is failed", key)
+		return defaultValue, nil
 	}
 	return v, nil
 }
 
-func getViperInt64(key string, defaultValue interface{}) (int64, error) {
+func getViperStringArray(key string, defaultValue []string) ([]string, error) {
+	v := viper.GetStringSlice(key)
+	if v == nil {
+		return defaultValue, nil
+	}
+	return v, nil
+}
+
+func getViperInt64(key string, defaultValue int64) (int64, error) {
 	v := viper.GetInt64(key)
 	if v == 0 {
-		s, ok := defaultValue.(int64)
-		if ok {
-			return s, nil
-		}
-		return 0, fmt.Errorf("convert key %s to int64 is failed", key)
+		return defaultValue, nil
 	}
 	return v, nil
 }
 
-func getViperFloat32(key string, defaultValue interface{}) (float32, error) {
+func getViperFloat32(key string, defaultValue float32) (float32, error) {
 	v := viper.GetFloat64(key)
 	if v == 0 {
-		s, ok := defaultValue.(float64)
-		if ok {
-			return float32(s), nil
-		}
-		return 0, fmt.Errorf("convert key %s to int64 is failed", key)
+		return defaultValue, nil
 	}
 	return float32(v), nil
 }
 
-func getViperFloat64(key string, defaultValue interface{}) (float64, error) {
+func getViperFloat64(key string, defaultValue float64) (float64, error) {
 	v := viper.GetFloat64(key)
 	if v == 0 {
-		s, ok := defaultValue.(float64)
-		if ok {
-			return s, nil
-		}
-		return 0, fmt.Errorf("convert key %s to int64 is failed", key)
+		return defaultValue, nil
 	}
 	return v, nil
 }
 
-func getViperBool(key string, defaultValue interface{}) (bool, error) {
+func getViperBool(key string, defaultValue bool) (bool, error) {
 	v := viper.GetBool(key)
 	if !v {
-		s, ok := defaultValue.(bool)
-		if ok {
-			return s, nil
-		}
-		return false, fmt.Errorf("convert key %s to bool is failed", key)
+		return defaultValue, nil
 	}
 	return v, nil
 }
